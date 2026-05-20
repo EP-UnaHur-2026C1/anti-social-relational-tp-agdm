@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-const routeTag = require("../routes/tag.routes.js");
+const routerTag = require("../routes/tag.routes.js");
 
 app.use(express.json());
 
-app.use("/tags", routeTag);
+app.use("/tag", routerTag);
 
 app.get("/", (req, res) => {
   res.send("Welcome to UnaHur - Anti-Social net!");
