@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Post.init({
-    description: { type: DataTypes.TEXT, allowNull: false }
+    description: { type: DataTypes.TEXT, allowNull: false },
+    userNickname: { type: DataTypes.STRING, allowNull: false }
   }, {
     sequelize,
     modelName: 'Post',

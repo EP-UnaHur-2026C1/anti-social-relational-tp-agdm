@@ -15,6 +15,22 @@ module.exports = {
       visible: {
         type: Sequelize.BOOLEAN
       },
+      userNickname: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'nickName'
+        }
+      },
+      postId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Posts',
+          key: 'id'
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
