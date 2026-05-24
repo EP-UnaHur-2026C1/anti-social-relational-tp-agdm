@@ -17,7 +17,7 @@ const validarIdPost = async (req, res, next) => {
         req.post = post;
         next();
     }catch (error){
-        res.status(500).json({message: error.message[0]});
+        res.status(500).json({message: error.message});
     };
 };
 

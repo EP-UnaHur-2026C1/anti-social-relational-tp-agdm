@@ -45,8 +45,30 @@ const obtenerPosts = async (req,res) => {
     }
 }
 
+const actualizarPost = async (req,res) => {
+    try{
+        const {description,tags} = req.body
+        const post = req.post
+        await post.update({
+            description
+        })
+        let tag = 0
+        tags.forEach(async t => {
+            tag = await Tag.findOrCreate({
+                where: {nombre: t},
+                default:{nombre: t}
+            });
+            await post.addTag(tag)
+        });
+        res.status(201).json(post)
+    }catch (error){
+        res.status(500).json({ message: error.message})
+    }
+}
+
 module.exports = {
     crearPost,
     obtenerPost,
-    obtenerPosts
+    obtenerPosts,
+    actualizarPost
 }

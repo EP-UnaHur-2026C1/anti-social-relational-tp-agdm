@@ -10,5 +10,7 @@ router.get("/:id",validarIdPost,postController.obtenerPost);
 
 router.get("/",postController.obtenerPosts);
 
+router.put("/:id",validarIdPost,validarDatosPost,postController.actualizarPost)
+
 
 module.exports = router
