@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: 'userNickname', targetKey: 'nickName', as: 'author' });
       this.hasMany(models.Comment, { foreignKey: 'postId', as: 'comments' });
-      this.belongsToMany(models.Tag, { through: 'PostTags', foreignKey: 'postId', otherKey: 'tagId' });
+      this.belongsToMany(models.Tag, { through: 'PostTags', foreignKey: 'postId', otherKey: 'tagId', as: "tags"});
       this.hasMany(models.PostImage, { foreignKey: 'postId', as: 'images' });
     }
   }
