@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const validate = require('../middlewares/validate.middleware');
 
 const crearComentarioSchema = Joi.object({
     contenido: Joi.string().min(1).max(500).required().messages({
@@ -20,6 +21,6 @@ const actualizarComentarioSchema = Joi.object({
 });
 
 module.exports = {
-    crearComentarioSchema,
-    actualizarComentarioSchema,
+    crearComentarioConValidacion:validate(crearComentarioSchema),
+    actualizarComentarioConValidacion:validate(actualizarComentarioSchema),
 };
