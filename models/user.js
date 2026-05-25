@@ -13,8 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Post, { foreignKey: 'userNickname', sourceKey: 'nickName', as: 'posts' });
       this.hasMany(models.Comment, { foreignKey: 'userNickname', sourceKey: 'nickName', as: 'comments' });
       this.belongsToMany(models.User, { as: 'Followers', through: 'UserFollowers', foreignKey: 'followingId' });
-      this.belongsToMany(models.User, { as: 'Following', through: 'UserFollowers', foreignKey: 'followerId' });
+      this.belongsToMany(models.User, { as: 'Following', through: 'UserFollowers', foreignKey: 'followerId' }); 
     }
+    
   }
   User.init({
     nickName: { type: DataTypes.STRING, primaryKey: true },

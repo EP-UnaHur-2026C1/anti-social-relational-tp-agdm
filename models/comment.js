@@ -16,7 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Comment.init({
     contenido: { type: DataTypes.TEXT, allowNull: false },
-    visible: { type: DataTypes.BOOLEAN, defaultValue: true }
+    visible: { type: DataTypes.BOOLEAN, defaultValue: true },
+    userNickname: { type: DataTypes.STRING, allowNull: false }, 
+    postId: { type: DataTypes.INTEGER, allowNull: false } 
   }, {
     sequelize,
     modelName: 'Comment',

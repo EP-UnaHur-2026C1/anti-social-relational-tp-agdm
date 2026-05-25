@@ -1,22 +1,23 @@
 const express = require("express");
+require('dotenv').config();
 const app = express();
-const db = require("../models");
-const port = 3000;
-const routerTag = require("../routes/tag.routes.js");
-const routerPost = require("../routes/post.routes.js");
+const port = process.env.PORT;
+const db = require('../models')
 
-app.use(express.json());
+app.use(express.json()); 
 
-app.use("/tag", routerTag);
-app.use("/post", routerPost);
+// Rutas 
+const routes = require('../routes');
+
+app.use(routes);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to UnaHur - Anti-Social net!");
+  res.send("Bienvenido a UnaHur - Anti-Social net!");
 });
 
 app.listen(port, async () => {
   await db.sequelize.sync();
-  console.log(`UnaHur app listening at http://localhost:${port}`);
+  console.log(`UnaHur app escuchando en http://localhost:${port}`);
 });
 
-console.log("UnaHur - Anti-Social net");
+console.log("UnaHur - Anti-Social Net");
