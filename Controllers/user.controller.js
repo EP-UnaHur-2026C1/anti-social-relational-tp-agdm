@@ -11,7 +11,8 @@ const obtenerUsuarios = async (req,res)=>{
         res.status(500).json({error: 'Error al obtener los usuarios'});
     }
 
-}
+};
+
 const obtenerUsuario = async (req, res) => {
   try {
     const usuarioCompleto = await User.findByPk(req.usuario.nickName, {
@@ -31,7 +32,8 @@ const obtenerUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el usuario' });
   }
 };
-const crearUsuario = async(req,res)=>{
+
+const crearUsuario = async(req,res,next)=>{
     try {
         const {nickName,email,password} = req.body;
         const nuevoUsuario = await User.create({nickName,email,password});
@@ -39,7 +41,8 @@ const crearUsuario = async(req,res)=>{
     } catch(error){
         res.status(500).json({error: 'Error al crear el usuario'});
     }
-}
+};
+
 const actualizarUsuario = async (req, res) => {
   try {
     await req.usuario.update(req.body);
@@ -48,6 +51,7 @@ const actualizarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el usuario' });
   }
 };
+
 const eliminarUsuario = async(req,res)=>{
     try{
         const {nickName} = req.params;
@@ -56,7 +60,8 @@ const eliminarUsuario = async(req,res)=>{
     } catch(error){
         res.status(500).json({error: `Error al eliminar el usuario ${nickName}`});
     }
-}
+};
+
 const seguirUsuario = async (req, res) => {
   try {
     const { seguidor, seguido } = req.body;
@@ -90,7 +95,6 @@ const dejarDeSeguir = async (req, res) => {
     res.status(500).json({ error: 'Error al dejar de seguir al usuario' });
   }
 };
-
 
 module.exports = {
     obtenerUsuarios,

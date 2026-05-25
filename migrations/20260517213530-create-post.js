@@ -13,14 +13,6 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
-      userNickname: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        references: {
-          model: 'Users',
-          key: 'nickName'
-        }
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

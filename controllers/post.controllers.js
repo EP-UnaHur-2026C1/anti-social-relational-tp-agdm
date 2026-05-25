@@ -1,24 +1,35 @@
 const { where } = require('sequelize');
-const {Post,Tag} = require('../models');
+const {Post,Tag,User} = require('../models');
 
 
 const crearPost = async (req,res) => {
     try{
         const {description,tags} = req.body
-        const post = await Post.create({
-            description
-        })
+        const post = await Post.create({description})
+        await req.usuario.addPost(post)
         let tag = 0
-        tags.forEach(async t => {
+        for (const t of tags){
             tag = await Tag.findOrCreate({
                 where: {nombre: t},
-                default:{nombre: t}
+                defaults:{nombre: t}
             });
-            await post.addTag(tag)
-        });
+            await post.addTag(tag[0])
+        }
         res.status(201).json(post)
     }catch (error){
-        res.status(500).json({ message: error.message})
+        res.status(500).json({ message: "no se pudo crear el post"})
+    }
+}
+
+const eliminarPost = async (req,res) => {
+    try{
+        const post = req.post
+        await req.usuario.removePost(post)
+        await post.removeTags()
+        await post.destroy()
+        res.status(204)
+    }catch (error){
+        res.status(500).json({ message: "no se pudo eliminar el post"})
     }
 }
 
@@ -29,38 +40,40 @@ const obtenerPost = async (req,res) => {
 
 const obtenerPosts = async (req,res) => {
     try{
-        const post = await Post.findAll({
-            attributes: ["description"],
+        const posts = await Post.findAll({
+            attributes: ["id","userNickname","description"],
             include:{
                 model: Tag,
                 as: "tags",
-                attributes: ["nombre"]
+                attributes: ["nombre"],
+                through: {
+                    attributes: []
+                }
             }
         });
-        res.status(200).json(post);
+        res.status(200).json(posts);
     }catch (error) {
         res.status(500).json({
-            message: error.message
+            message: "no se pudo obtener el post"
         })
     }
 }
 
 const actualizarPost = async (req,res) => {
     try{
-        const {description,tags} = req.body
         const post = req.post
-        await post.update({
-            description
-        })
-        let tag = 0
-        tags.forEach(async t => {
-            tag = await Tag.findOrCreate({
+        const {description,tags} = req.body
+        await post.update({description})
+        const arrayTags = []
+        for (const t of tags){
+            const [tag] = await Tag.findOrCreate({
                 where: {nombre: t},
-                default:{nombre: t}
+                defaults:{nombre: t}
             });
-            await post.addTag(tag)
-        });
-        res.status(201).json(post)
+            arrayTags.push(tag)
+        }
+        await post.setTags(arrayTags)
+        res.status(200).json(post)
     }catch (error){
         res.status(500).json({ message: error.message})
     }
@@ -70,5 +83,6 @@ module.exports = {
     crearPost,
     obtenerPost,
     obtenerPosts,
-    actualizarPost
+    actualizarPost,
+    eliminarPost
 }
