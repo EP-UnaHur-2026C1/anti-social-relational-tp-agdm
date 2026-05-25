@@ -1,14 +1,15 @@
 const express = require("express");
+require('dotenv').config();
 const app = express();
 const port = process.env.PORT;
 const db = require('../models')
-require('dotenv').config();
+
 app.use(express.json()); 
 
 // Rutas 
 const routes = require('../routes');
-app.use('/comments', commentRoutes);
-app.use('/users', userRouter);
+
+app.use(routes);
 
 app.get("/", (req, res) => {
   res.send("Bienvenido a UnaHur - Anti-Social net!");
@@ -20,4 +21,3 @@ app.listen(port, async () => {
 });
 
 console.log("UnaHur - Anti-Social Net");
-
