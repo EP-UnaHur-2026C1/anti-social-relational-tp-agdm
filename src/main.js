@@ -7,9 +7,10 @@ const db = require('../models')
 app.use(express.json()); 
 
 // Rutas 
+const postRoutes = require('../routes/post.router');
 const commentRoutes = require('../routes/comments.routes');
 app.use('/comments', commentRoutes);
-
+app.use('/posts', postRoutes);
 app.get("/", (req, res) => {
   res.send("Bienvenido a UnaHur - Anti-Social net!");
 });
