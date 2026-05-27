@@ -4,10 +4,6 @@ const { verificarUsuarioExiste, verificarUsuariosFollow } = require('../middlewa
 const { validarRepeticiones } = require('../middlewares/validarUsuario.middleware');
 const { validarCreacion, validarActualizacion, validarFollow} = require('../schemas/user.schema');
 
-const postController = require('../controllers/post.controllers.js');
-const {validarDatosPost} = require("../middlewares/validarDatosPost.js")
-const {validarIdPost} = require("../middlewares/validarIdPost.js")
-
 const router = Router();
 
 // USERS
