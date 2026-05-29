@@ -10,12 +10,16 @@
   "author": "Gerardo Gonzalez Tulian",
   "license": "MIT",
   "devDependencies": {
+    "dotenv": "^17.4.2",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.5"
   },
   "dependencies": {
     "express": "^5.2.1",
     "joi": "^18.2.1",
-    "sequelize": "^6.37.8"
+    "js-yaml": "^4.1.1",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1",
+    "swagger-ui-express": "^5.0.1"
   }
 }
