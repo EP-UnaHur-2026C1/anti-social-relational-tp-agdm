@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 const obtenerComentarios = async (req, res) => {
     try {
-        const { postId } = req.params;
+        const { id } = req.params;
 
         const mesesVisibilidad = process.env.MESES_VISIBILIDAD || 6;
         

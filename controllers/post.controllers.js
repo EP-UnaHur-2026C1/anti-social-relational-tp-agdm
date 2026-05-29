@@ -28,7 +28,6 @@ const crearPost = async (req,res) => {
   }
 }
 
-
 const obtenerPosts = async (req,res) => {
     try{
         const posts = await Post.findAll({
