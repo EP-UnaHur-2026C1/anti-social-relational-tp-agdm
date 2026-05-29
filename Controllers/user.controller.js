@@ -59,38 +59,41 @@ const eliminarUsuario = async(req,res)=>{
 }
 const seguirUsuario = async (req, res) => {
   try {
-    const { seguidor, seguido } = req.body;
+    const { seguidorNick } = req.params; 
+    const { seguir } = req.body; 
 
-    if (seguidor === seguido)
+    if (seguidorNick === seguir) {
       return res.status(400).json({ error: 'No podés seguirte a vos mismo' });
-
+    }
     const yaLoSigue = await req.usuarioSeguidor.hasFollowing(req.usuarioSeguido);
-    if (yaLoSigue)
+    if (yaLoSigue) {
       return res.status(409).json({ error: 'Ya seguís a este usuario' });
-
+    }
     await req.usuarioSeguidor.addFollowing(req.usuarioSeguido);
-    
-    res.status(200).json({ message: `${seguidor} está siguiendo ahora a ${seguido}` });
+
+    res.status(200).json({ message: `${seguidorNick} está siguiendo ahora a ${seguir}` });
   } catch (error) {
-    res.status(500).json({ error:`No se ha podido seguir a ${seguido}`});
+    res.status(500).json({ error: `No se ha podido seguir al usuario.` });
   }
 };
 
 const dejarDeSeguir = async (req, res) => {
   try {
-    const { seguidor, seguido } = req.body;
-    
+    const { seguidorNick } = req.params; 
+    const { seguir } = req.body; 
+    if (seguidorNick === seguir) {
+      return res.status(400).json({ error: 'No podés dejar de seguirte a vos mismo' });
+    }
     const loSigue = await req.usuarioSeguidor.hasFollowing(req.usuarioSeguido);
-    if (!loSigue)
-      return res.status(400).json({ error: 'No seguís a este usuario' });
-
+    if (!loSigue) {
+      return res.status(400).json({ error: `No estás siguiendo a ${seguir}` });
+    }
     await req.usuarioSeguidor.removeFollowing(req.usuarioSeguido);
-    res.status(200).json({ message: `${seguidor} dejó de seguir a ${seguido}` });
+    res.status(200).json({ message: `${seguidorNick} ha dejado de seguir a ${seguir}` });
   } catch (error) {
-    res.status(500).json({ error: 'Error al dejar de seguir al usuario' });
+    res.status(500).json({ error: `No se ha podido dejar de seguir al usuario.` });
   }
 };
-
 
 module.exports = {
     obtenerUsuarios,
