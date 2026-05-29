@@ -4,6 +4,14 @@ const app = express();
 const port = process.env.PORT;
 const db = require('../models')
 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('js-yaml');
+const fs = require('fs');
+
+// Swagger UI
+const swaggerDoc = YAML.load(fs.readFileSync('./docs/swagger.yaml', 'utf8'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
 app.use(express.json()); 
 
 // Rutas 

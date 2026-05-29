@@ -1,0 +1,464 @@
+{
+  "info": {
+    "name": "Anti-Social Net API",
+    "_postman_id": "anti-social-net-2024",
+    "description": "Colección completa de endpoints para la API de UnaHur Anti-Social Net",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Obtener todos los usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Retorna nickName y email de todos los usuarios"
+          }
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"juanito99\",\n  \"email\": \"juan@mail.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Crea un nuevo usuario. nickName debe ser único."
+          }
+        },
+        {
+          "name": "Obtener usuario por nickName",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["users", "juanito99"]
+            },
+            "description": "Retorna el usuario con sus Followers y Following"
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo_email@mail.com\",\n  \"password\": \"nuevaPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["users", "juanito99"]
+            },
+            "description": "Actualiza email y/o password del usuario"
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["users", "juanito99"]
+            },
+            "description": "Elimina el usuario con el nickName especificado"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Followers",
+      "item": [
+        {
+          "name": "Seguir usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seguir\": \"maria_gomez\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/juanito99/follow",
+              "host": ["{{base_url}}"],
+              "path": ["users", "juanito99", "follow"]
+            },
+            "description": "juanito99 (seguidorNick en la URL) sigue a maria_gomez (seguir en el body)"
+          }
+        },
+        {
+          "name": "Dejar de seguir usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seguir\": \"maria_gomez\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/juanito99/unfollow",
+              "host": ["{{base_url}}"],
+              "path": ["users", "juanito99", "unfollow"]
+            },
+            "description": "juanito99 deja de seguir a maria_gomez"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Obtener todos los posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post",
+              "host": ["{{base_url}}"],
+              "path": ["post"]
+            },
+            "description": "Retorna todos los posts con author, comments, images y tags"
+          }
+        },
+        {
+          "name": "Obtener post por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post/1",
+              "host": ["{{base_url}}"],
+              "path": ["post", "1"]
+            },
+            "description": "Retorna un post específico por su ID"
+          }
+        },
+        {
+          "name": "Obtener posts por usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post/user/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["post", "user", "juanito99"]
+            },
+            "description": "Retorna todos los posts del usuario ordenados por fecha DESC"
+          }
+        },
+        {
+          "name": "Crear post",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Este es mi primer post en Anti-Social Net!\",\n  \"tags\": [\"tecnologia\", \"unahur\"],\n  \"images\": [\"https://ejemplo.com/imagen1.jpg\", \"https://ejemplo.com/imagen2.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/post/users/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["post", "users", "juanito99"]
+            },
+            "description": "Crea un post para el usuario especificado. tags e images pueden ser arrays vacíos."
+          }
+        },
+        {
+          "name": "Crear post (sin imágenes ni tags)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Post sin imágenes ni tags\",\n  \"tags\": [],\n  \"images\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/post/users/juanito99",
+              "host": ["{{base_url}}"],
+              "path": ["post", "users", "juanito99"]
+            },
+            "description": "Crea un post mínimo solo con description obligatoria"
+          }
+        },
+        {
+          "name": "Actualizar post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción actualizada del post\",\n  \"tags\": [\"actualizado\", \"nuevo-tag\"],\n  \"images\": [\"https://ejemplo.com/nueva-imagen.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/post/1",
+              "host": ["{{base_url}}"],
+              "path": ["post", "1"]
+            },
+            "description": "Reemplaza description, tags e images del post. Las imágenes anteriores se eliminan."
+          }
+        },
+        {
+          "name": "Eliminar post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post/1",
+              "host": ["{{base_url}}"],
+              "path": ["post", "1"]
+            },
+            "description": "Elimina el post y todas sus imágenes asociadas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Obtener comentarios de un post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comments/post/1",
+              "host": ["{{base_url}}"],
+              "path": ["comments", "post", "1"]
+            },
+            "description": "Retorna comentarios visibles del post, filtrando por MESES_VISIBILIDAD del .env"
+          }
+        },
+        {
+          "name": "Crear comentario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Excelente post, muy interesante!\",\n  \"postId\": 1,\n  \"userNickname\": \"maria_gomez\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/comments",
+              "host": ["{{base_url}}"],
+              "path": ["comments"]
+            },
+            "description": "Crea un comentario sobre un post. Se crea con visible: true por defecto."
+          }
+        },
+        {
+          "name": "Actualizar comentario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Comentario editado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/comments/1",
+              "host": ["{{base_url}}"],
+              "path": ["comments", "1"]
+            },
+            "description": "Actualiza el contenido de un comentario por su ID"
+          }
+        },
+        {
+          "name": "Eliminar comentario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comments/1",
+              "host": ["{{base_url}}"],
+              "path": ["comments", "1"]
+            },
+            "description": "Elimina un comentario por su ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "item": [
+        {
+          "name": "Obtener todos los tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tags",
+              "host": ["{{base_url}}"],
+              "path": ["tags"]
+            },
+            "description": "Retorna todos los tags registrados con su nombre"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flujo completo de prueba",
+      "item": [
+        {
+          "name": "1. Crear usuario A",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"usuarioA\",\n  \"email\": \"usuarioA@mail.com\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "2. Crear usuario B",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"usuarioB\",\n  \"email\": \"usuarioB@mail.com\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "3. usuarioA sigue a usuarioB",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seguir\": \"usuarioB\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/usuarioA/follow",
+              "host": ["{{base_url}}"],
+              "path": ["users", "usuarioA", "follow"]
+            }
+          }
+        },
+        {
+          "name": "4. usuarioA crea un post con tags",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Mi primer post del flujo de prueba\",\n  \"tags\": [\"prueba\", \"demo\"],\n  \"images\": [\"https://picsum.photos/400/300\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/post/users/usuarioA",
+              "host": ["{{base_url}}"],
+              "path": ["post", "users", "usuarioA"]
+            }
+          }
+        },
+        {
+          "name": "5. usuarioB comenta el post (id=1)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Qué buen post usuarioA!\",\n  \"postId\": 1,\n  \"userNickname\": \"usuarioB\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/comments",
+              "host": ["{{base_url}}"],
+              "path": ["comments"]
+            }
+          }
+        },
+        {
+          "name": "6. Ver todos los posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post",
+              "host": ["{{base_url}}"],
+              "path": ["post"]
+            }
+          }
+        },
+        {
+          "name": "7. Ver comentarios del post (id=1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comments/post/1",
+              "host": ["{{base_url}}"],
+              "path": ["comments", "post", "1"]
+            }
+          }
+        },
+        {
+          "name": "8. Ver tags creados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tags",
+              "host": ["{{base_url}}"],
+              "path": ["tags"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
