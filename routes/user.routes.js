@@ -10,7 +10,6 @@ const router = Router();
 router.get('/', controller.obtenerUsuarios);
 router.post('/', validarCreacion,validarRepeticiones, controller.crearUsuario); //json
 
-
 router.post('/:seguidorNick/follow', validarFollow, verificarUsuariosFollow, controller.seguirUsuario); //json
 router.delete('/:seguidorNick/unfollow', validarFollow, verificarUsuariosFollow, controller.dejarDeSeguir);//json
 
