@@ -30,7 +30,7 @@ const validarIdPost = async (req, res, next) => {
                 }
             }]
         })
-         if (!post) {
+        if (!post) {
             return res.status(404).json({ error: 'Post no encontrado.' });
         }
         req.post = post
