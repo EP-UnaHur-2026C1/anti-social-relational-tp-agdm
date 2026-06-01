@@ -17,9 +17,6 @@ router.get('/:nickName', verificarUsuarioExiste, controller.obtenerUsuario);
 router.put('/:nickName', validarActualizacion,validarRepeticiones,controller.actualizarUsuario); //json
 router.delete('/:nickName', verificarUsuarioExiste, controller.eliminarUsuario);
 
-// FOLLOWS
-router.post('/follow', validarFollow, verificarUsuariosFollow, controller.seguirUsuario); //json
-router.delete('/follow', validarFollow, verificarUsuariosFollow, controller.dejarDeSeguir);//json
 
 // recuerden mandar los json necesarios a la hora de probar cada ruta
 module.exports = router;
