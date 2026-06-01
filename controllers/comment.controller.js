@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 const obtenerComentarios = async (req, res) => {
     try {
-        const { id } = req.params;
+        const postId = req.post.id
 
         const mesesVisibilidad = process.env.MESES_VISIBILIDAD || 6;
         
@@ -23,7 +23,7 @@ const obtenerComentarios = async (req, res) => {
                 {
                     model: User,
                     as: "author",
-                    attributes: ['nickname'],
+                    attributes: ['nickName'],
                 },
             ],
         });
