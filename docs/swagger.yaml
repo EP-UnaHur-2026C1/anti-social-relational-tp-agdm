@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: UnaHur Anti-Social Net API
-  description: API REST para la red social Anti-Social Net. Permite gestionar usuarios, posts, comentarios, tags y followers.
+  title: UnaHur Anti-Social Net API - AGDM
+  description: API REST para la red social Anti-Social Net.
   version: 1.0.0
 
 servers:
@@ -10,19 +10,18 @@ servers:
 
 tags:
   - name: Users
-    description: Gestión de usuarios registrados
+    description: Gestión de usuarios
   - name: Followers
-    description: Gestión de seguidores entre usuarios
+    description: Gestión de seguidores
   - name: Posts
     description: Gestión de publicaciones
   - name: Comments
-    description: Gestión de comentarios en publicaciones
+    description: Gestión de comentarios
   - name: Tags
     description: Gestión de etiquetas
+  - name: Images
+    description: Gestión de imágenes de posts
 
-# ─────────────────────────────────────────────
-# PATHS
-# ─────────────────────────────────────────────
 paths:
   # ── USERS ──────────────────────────────────
 
@@ -30,36 +29,20 @@ paths:
     get:
       tags: [Users]
       summary: Obtener todos los usuarios
-      description: Retorna la lista de todos los usuarios con nickName y email.
       responses:
         "200":
-          description: Lista de usuarios obtenida correctamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserBasico"
-              example:
-                - nickName: juanito99
-                  email: juan@mail.com
-                - nickName: maria_gomez
-                  email: maria@mail.com
+          description: Lista de usuarios con nickName y email
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
     post:
       tags: [Users]
-      summary: Crear un nuevo usuario
-      description: |
-        Crea un nuevo usuario. El nickName es la clave primaria y debe ser único.
-        El email también debe ser único.
+      summary: Crear usuario
+      description: nickName es PK y único. Email único. Password mínimo 6 caracteres.
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/UserCrear"
             example:
               nickName: juanito99
               email: juan@mail.com
@@ -67,169 +50,44 @@ paths:
       responses:
         "201":
           description: Usuario creado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserCompleto"
         "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/ErrorValidacion"
-                  - $ref: "#/components/schemas/ErrorSimple"
-              examples:
-                campoFaltante:
-                  summary: Campo obligatorio faltante
-                  value:
-                    errors:
-                      ["El nickName es obligatorio", "El email es obligatorio"]
-                nickRepetido:
-                  summary: NickName ya en uso
-                  value:
-                    error: "El nombre de usuario ya está en uso."
-                emailRepetido:
-                  summary: Email ya en uso
-                  value:
-                    error: "El correo electrónico ya se encuentra en uso por otro usuario."
+          description: |
+            Error de validación. Posibles causas:
+            - nickName menor a 3 caracteres o mayor a 30
+            - Email con formato inválido
+            - Password menor a 6 caracteres
+            - nickName o email ya en uso
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /users/{nickName}:
     get:
       tags: [Users]
       summary: Obtener usuario por nickName
-      description: Retorna el usuario con sus listas de Followers y Following.
+      description: Retorna el usuario con sus listas Followers y Following
       parameters:
-        - $ref: "#/components/parameters/nickName"
+        - name: nickName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: juanito99
       responses:
         "200":
-          description: Usuario encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetalle"
-              example:
-                nickName: juanito99
-                email: juan@mail.com
-                Followers:
-                  - nickName: maria_gomez
-                Following:
-                  - nickName: pedro123
+          description: Usuario encontrado con Followers y Following
         "404":
           description: Usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "El usuario 'juanito99' no existe"
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
     put:
       tags: [Users]
       summary: Actualizar usuario
-      description: |
-        Actualiza email y/o password del usuario. El nickName no puede modificarse.
-        Se debe enviar al menos un campo.
+      description: Actualiza email y/o password. Se debe enviar al menos un campo. El nickName no se puede modificar.
       parameters:
-        - $ref: "#/components/parameters/nickName"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserActualizar"
-            examples:
-              soloEmail:
-                summary: Actualizar solo email
-                value:
-                  email: nuevo@mail.com
-              soloPassword:
-                summary: Actualizar solo password
-                value:
-                  password: nuevaPass123
-              ambos:
-                summary: Actualizar ambos
-                value:
-                  email: nuevo@mail.com
-                  password: nuevaPass123
-      responses:
-        "200":
-          description: Usuario actualizado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserBasico"
-              example:
-                nickName: juanito99
-                email: nuevo@mail.com
-        "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorValidacion"
-              example:
-                errors:
-                  [
-                    "Debes enviar al menos un campo (email o password) para actualizar",
-                  ]
-        "404":
-          description: Usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "El usuario 'juanito99' no existe."
-        "500":
-          $ref: "#/components/responses/Error500"
-
-    delete:
-      tags: [Users]
-      summary: Eliminar usuario
-      parameters:
-        - $ref: "#/components/parameters/nickName"
-      responses:
-        "200":
-          description: Usuario eliminado correctamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "Usuario juanito99 eliminado correctamente"
-        "404":
-          description: Usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "El usuario 'juanito99' no existe"
-        "500":
-          $ref: "#/components/responses/Error500"
-
-  # ── FOLLOWERS ──────────────────────────────
-
-  /users/{seguidorNick}/follow:
-    post:
-      tags: [Followers]
-      summary: Seguir a un usuario
-      description: |
-        El usuario indicado en la URL (seguidorNick) comienza a seguir
-        al usuario indicado en el body (seguir). No se puede seguir a uno mismo.
-      parameters:
-        - name: seguidorNick
+        - name: nickName
           in: path
           required: true
-          description: nickName del usuario que quiere seguir a otro
           schema:
             type: string
           example: juanito99
@@ -237,53 +95,68 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/FollowBody"
+            example:
+              email: nuevo@mail.com
+              password: nuevaPass123
+      responses:
+        "200":
+          description: Usuario actualizado. Retorna nickName y email.
+        "400":
+          description: Error de validación o email ya en uso
+        "404":
+          description: Usuario no encontrado
+        "500":
+          description: Error interno del servidor
+
+    delete:
+      tags: [Users]
+      summary: Eliminar usuario
+      parameters:
+        - name: nickName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: juanito99
+      responses:
+        "200":
+          description: Usuario eliminado correctamente
+        "404":
+          description: Usuario no encontrado
+        "500":
+          description: Error interno del servidor
+
+  # ── FOLLOWERS ──────────────────────────────
+
+  /users/{seguidorNick}/follow:
+    post:
+      tags: [Followers]
+      summary: Seguir a un usuario
+      description: seguidorNick (URL) sigue al usuario indicado en el body. No se puede seguir a uno mismo.
+      parameters:
+        - name: seguidorNick
+          in: path
+          required: true
+          schema:
+            type: string
+          example: juanito99
+      requestBody:
+        required: true
+        content:
+          application/json:
             example:
               seguir: maria_gomez
       responses:
         "200":
           description: Ahora sigue al usuario
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "juanito99 está siguiendo ahora a maria_gomez"
         "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              examples:
-                siMismo:
-                  value:
-                    error: "No podés seguirte a vos mismo"
-                campoFaltante:
-                  value:
-                    errors: ["Es obligatorio ingresar un usuario"]
+          description: No podés seguirte a vos mismo o campo faltante
         "404":
           description: Uno o ambos usuarios no existen
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Uno o ambos usuarios no existen."
         "409":
-          description: Ya sigue a ese usuario
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Ya seguís a este usuario"
+          description: Ya seguís a este usuario
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /users/{seguidorNick}/unfollow:
     delete:
@@ -293,7 +166,6 @@ paths:
         - name: seguidorNick
           in: path
           required: true
-          description: nickName del usuario que quiere dejar de seguir
           schema:
             type: string
           example: juanito99
@@ -301,45 +173,17 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/FollowBody"
             example:
               seguir: maria_gomez
       responses:
         "200":
           description: Dejó de seguir al usuario
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "juanito99 ha dejado de seguir a maria_gomez"
         "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              examples:
-                siMismo:
-                  value:
-                    error: "No podés dejar de seguirte a vos mismo"
-                noLoSigue:
-                  value:
-                    error: "No estás siguiendo a maria_gomez"
+          description: No lo seguías o campo faltante
         "404":
           description: Uno o ambos usuarios no existen
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Uno o ambos usuarios no existen."
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   # ── POSTS ───────────────────────────────────
 
@@ -347,200 +191,133 @@ paths:
     get:
       tags: [Posts]
       summary: Obtener todos los posts
-      description: Retorna todos los posts con su autor, comentarios, imágenes y tags.
+      description: Retorna todos los posts con author, comments, images y tags
       responses:
         "200":
-          description: Lista de posts obtenida correctamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PostDetalle"
+          description: Lista de posts
         "500":
-          $ref: "#/components/responses/Error500"
-
-  /post/{id}:
-    get:
-      tags: [Posts]
-      summary: Obtener post por ID
-      description: Retorna un post específico con autor, comentarios, imágenes y tags.
-      parameters:
-        - $ref: "#/components/parameters/postId"
-      responses:
-        "200":
-          description: Post encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PostDetalle"
-        "404":
-          description: Post no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Post no encontrado."
-        "500":
-          $ref: "#/components/responses/Error500"
-
-    put:
-      tags: [Posts]
-      summary: Actualizar post
-      description: |
-        Actualiza description, tags e images de un post.
-        Los tags e imágenes anteriores son reemplazados completamente por los nuevos.
-        Los tags deben comenzar con # y no tener espacios.
-      parameters:
-        - $ref: "#/components/parameters/postId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PostBody"
-            example:
-              description: "Post actualizado con nueva descripción"
-              tags: ["#tecnologia", "#unahur"]
-              images: ["https://ejemplo.com/nueva-imagen.jpg"]
-      responses:
-        "200":
-          description: Post actualizado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PostDetalle"
-        "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMensaje"
-              example:
-                message: "el tag debe comenzar con # y no puede haber espacio entre palabras"
-        "404":
-          description: Post no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Post no encontrado."
-        "500":
-          $ref: "#/components/responses/Error500"
-
-    delete:
-      tags: [Posts]
-      summary: Eliminar post
-      description: Elimina el post y todas sus imágenes asociadas.
-      parameters:
-        - $ref: "#/components/parameters/postId"
-      responses:
-        "200":
-          description: Post eliminado correctamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "Post eliminado correctamente."
-        "404":
-          description: Post no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Post no encontrado."
-        "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /post/users/{nickName}:
     post:
       tags: [Posts]
-      summary: Crear post para un usuario
+      summary: Crear post
       description: |
-        Crea un post asociado al usuario indicado. 
-        Los tags deben comenzar con # y no tener espacios (ej: #tecnologia).
-        Las images deben ser URLs válidas sin espacios.
-        Ambos arrays pueden estar vacíos.
+        Crea un post asociado al usuario.
+        Tags deben comenzar con # y sin espacios (ej: #tecnologia).
+        Images deben ser URLs válidas. Ambos arrays pueden estar vacíos.
       parameters:
-        - $ref: "#/components/parameters/nickName"
+        - name: nickName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: juanito99
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/PostBody"
-            examples:
-              completo:
-                summary: Con tags e imágenes
-                value:
-                  description: "Mi primer post en Anti-Social Net!"
-                  tags: ["#tecnologia", "#unahur"]
-                  images: ["https://ejemplo.com/imagen1.jpg"]
-              minimo:
-                summary: Solo descripción
-                value:
-                  description: "Post sin tags ni imágenes"
-                  tags: []
-                  images: []
+            example:
+              description: Mi primer post en Anti-Social Net!
+              tags: ["#tecnologia", "#unahur"]
+              images: ["https://picsum.photos/400/300"]
       responses:
         "201":
           description: Post creado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PostCreado"
         "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMensaje"
-              example:
-                message: "La descripción es obligatoria"
+          description: Error de validación (description vacía, tag sin #, URL inválida)
         "404":
           description: Usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "El usuario 'juanito99' no existe"
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /post/user/{nickName}:
     get:
       tags: [Posts]
       summary: Obtener posts de un usuario
-      description: Retorna todos los posts del usuario ordenados por fecha descendente, con imágenes y tags.
+      description: Retorna los posts del usuario ordenados por fecha DESC con images y tags
       parameters:
-        - $ref: "#/components/parameters/nickName"
+        - name: nickName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: juanito99
       responses:
         "200":
-          description: Posts del usuario obtenidos correctamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PostPorUsuario"
+          description: Lista de posts del usuario
         "404":
           description: Usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "El usuario 'juanito99' no existe"
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
+
+  /post/{id}:
+    get:
+      tags: [Posts]
+      summary: Obtener post por ID
+      description: Retorna el post con author, comments, images y tags
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Post encontrado
+        "404":
+          description: Post no encontrado
+        "500":
+          description: Error interno del servidor
+
+    put:
+      tags: [Posts]
+      summary: Actualizar post
+      description: Reemplaza description, tags e images. Las imágenes anteriores se eliminan.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              description: Descripción actualizada
+              tags: ["#actualizado"]
+              images: ["https://picsum.photos/400/300"]
+      responses:
+        "200":
+          description: Post actualizado correctamente
+        "400":
+          description: Error de validación
+        "404":
+          description: Post no encontrado
+        "500":
+          description: Error interno del servidor
+
+    delete:
+      tags: [Posts]
+      summary: Eliminar post
+      description: Elimina el post y todas sus imágenes asociadas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Post eliminado correctamente
+        "404":
+          description: Post no encontrado
+        "500":
+          description: Error interno del servidor
 
   # ── COMMENTS ───────────────────────────────
 
@@ -549,146 +326,96 @@ paths:
       tags: [Comments]
       summary: Crear comentario
       description: |
-        Crea un comentario sobre un post. El comentario se crea con visible true por defecto.
-        Tanto el post como el usuario deben existir.
+        Crea un comentario sobre un post. Se crea con visible true.
+        El post y el usuario deben existir.
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/CommentCrear"
             example:
-              contenido: "Excelente post, muy interesante!"
+              contenido: Excelente post!
               postId: 1
               userNickname: maria_gomez
       responses:
         "201":
           description: Comentario creado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CommentCompleto"
         "400":
-          description: Error de validación
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorValidacion"
-              example:
-                errors:
-                  [
-                    "El contenido del comentario es obligatorio.",
-                    "El ID del post es obligatorio.",
-                  ]
+          description: Error de validación (contenido vacío, postId o userNickname faltante)
         "404":
           description: Post o usuario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              examples:
-                postNoExiste:
-                  value:
-                    error: "El post no existe."
-                userNoExiste:
-                  value:
-                    error: "El usuario no existe."
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /comments/post/{postId}:
     get:
       tags: [Comments]
       summary: Obtener comentarios de un post
       description: |
-        Retorna los comentarios visibles del post que no sean más antiguos que
-        el valor de MESES_VISIBILIDAD configurado en el .env (por defecto 6 meses).
+        Retorna los comentarios visibles del post no más antiguos que
+        MESES_VISIBILIDAD del .env (default 6 meses).
+        Si el post no tiene comentarios retorna 400.
       parameters:
         - name: postId
           in: path
           required: true
-          description: ID del post
           schema:
             type: integer
           example: 1
       responses:
         "200":
-          description: Comentarios obtenidos correctamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CommentPublico"
-              example:
-                - id: 1
-                  contenido: "Gran post!"
-                  createdAt: "2024-10-15T14:30:00.000Z"
-                  author:
-                    nickname: maria_gomez
+          description: Lista de comentarios visibles y dentro del rango de meses
+        "400":
+          description: El post no tiene comentarios
+        "404":
+          description: Post no encontrado
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   /comments/{id}:
     put:
       tags: [Comments]
       summary: Actualizar comentario
-      description: Actualiza el contenido de un comentario por su ID.
+      description: Actualiza el contenido de un comentario por su ID
       parameters:
-        - $ref: "#/components/parameters/commentId"
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/CommentActualizar"
             example:
-              contenido: "Comentario editado"
+              contenido: Comentario editado
       responses:
         "200":
           description: Comentario actualizado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CommentCompleto"
+        "400":
+          description: Error de validación
         "404":
           description: Comentario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Comentario no encontrado."
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
     delete:
       tags: [Comments]
       summary: Eliminar comentario
       parameters:
-        - $ref: "#/components/parameters/commentId"
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
       responses:
         "200":
           description: Comentario eliminado correctamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-              example:
-                message: "Comentario eliminado correctamente."
         "404":
           description: Comentario no encontrado
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorSimple"
-              example:
-                error: "Comentario no encontrado."
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
   # ── TAGS ────────────────────────────────────
 
@@ -696,65 +423,101 @@ paths:
     get:
       tags: [Tags]
       summary: Obtener todos los tags
-      description: Retorna todos los tags registrados en el sistema.
       responses:
         "200":
-          description: Lista de tags obtenida correctamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Tag"
-              example:
-                - nombre: "#tecnologia"
-                - nombre: "#unahur"
-                - nombre: "#demo"
+          description: Lista de todos los tags con su nombre
         "500":
-          $ref: "#/components/responses/Error500"
+          description: Error interno del servidor
 
-# ─────────────────────────────────────────────
-# COMPONENTES
-# ─────────────────────────────────────────────
-components:
-  # ── PARAMETROS ─────────────────────────────
-  parameters:
-    nickName:
-      name: nickName
-      in: path
-      required: true
-      description: Identificador único del usuario (clave primaria)
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 30
-      example: juanito99
-
-    postId:
-      name: id
-      in: path
-      required: true
-      description: ID del post
-      schema:
-        type: integer
-      example: 1
-
-    commentId:
-      name: id
-      in: path
-      required: true
-      description: ID del comentario
-      schema:
-        type: integer
-      example: 1
-
-  # ── RESPUESTAS ──────────────────────────────
-  responses:
-    Error500:
-      description: Error interno del servidor
-      content:
-        application/json:
+  /tags/post/{id}:
+    get:
+      tags: [Tags]
+      summary: Obtener tags de un post
+      description: Retorna los nombres de los tags asociados a un post específico
+      parameters:
+        - name: id
+          in: path
+          required: true
           schema:
-            $ref: "#/components/schemas/ErrorSimple"
-          example:
-            error: "Error interno del servidor"
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Lista de nombres de tags del post
+        "404":
+          description: Post no encontrado
+        "500":
+          description: Error interno del servidor
+
+  /tags/{id}:
+    delete:
+      tags: [Tags]
+      summary: Eliminar tag
+      description: Elimina un tag por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Tag eliminado correctamente
+        "404":
+          description: Tag no encontrado
+        "500":
+          description: Error interno del servidor
+
+  # ── IMAGES ──────────────────────────────────
+
+  /image:
+    get:
+      tags: [Images]
+      summary: Obtener todas las imágenes
+      description: Retorna todas las imágenes con id, url y postId
+      responses:
+        "200":
+          description: Lista de todas las imágenes
+        "500":
+          description: Error interno del servidor
+
+  /image/post/{id}:
+    get:
+      tags: [Images]
+      summary: Obtener imágenes de un post
+      description: Retorna todas las imágenes asociadas a un post específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Lista de imágenes del post con id y url
+        "404":
+          description: Post no encontrado
+        "500":
+          description: Error interno del servidor
+
+  /image/{id}:
+    delete:
+      tags: [Images]
+      summary: Eliminar imagen
+      description: Elimina una imagen por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Imagen eliminada correctamente
+        "404":
+          description: Imagen no encontrada
+        "500":
+          description: Error interno del servidor
